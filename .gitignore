@@ -1,0 +1,7 @@
+
+target/
+dbt_packages/
+logs/
+dbt.log
+# ignore all Parquet files
+*.parquet

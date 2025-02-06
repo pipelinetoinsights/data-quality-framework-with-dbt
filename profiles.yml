@@ -1,0 +1,7 @@
+my_duckdb_project:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "data/company_database.duckdb"  # Path to your DuckDB database file
+      threads: 4

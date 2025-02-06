@@ -1,0 +1,53 @@
+version: 2
+
+sources:
+  - name: company_database  # Name for DuckDB database source
+    schema: quote_services  # Schema inside the database
+    tables:
+      - name: customer
+        description: "inlcude customer info"
+        columns:
+          - name: phone_number
+            tests:
+              - dbt_expectations.expect_column_values_to_match_regex:
+                  regex: "^\\+(61|64)[0-9]{9}$"
+                  is_raw: true
+      - name: material
+        description: "list of materials used in jobs related to quotes"
+        columns:
+          - name: material_name
+            tests:
+              - dbt_expectations.expect_column_values_to_be_in_set:
+                  value_set: ['belt','screw','ac','air handling unit']
+                  quote_values: true # (Optional. Default is 'true'.)
+                  row_condition: "id is not null" # (Optional)
+      - name: employee
+        description: "emplyees information"
+        columns:
+          - name: employee_id
+            tests:
+              - unique
+      - name: quote
+        description: "stores quotes with their status and dates"
+        tests:
+          - validate_quote_status
+      - name: job_hours
+        description: "stores hours for each quoted job"
+        tests:
+          - validate_job_hours
+      - name: customer_info
+        description: "companies info"
+        tests:
+          - validate_company_state
+      - name: quote_jobs
+        description: "sotre generated quotes with their info"
+        freshness:
+          warn_after: { count: 14, period: day }  # Warning if data is older than 14 days
+          error_after: { count: 16, period: day } # Fail if data is older than 16 days
+        loaded_at_field: _elt_load_at  # Column that stores the last update timestamp
+      - name: quote_customer_location
+        description: "include customers address"
+        columns:
+          - name: address
+            tests:
+              - validate_company_address
