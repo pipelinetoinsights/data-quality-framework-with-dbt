@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  dbt:
+    build: .
+    volumes:
+      - .:/usr/app/dbt
+      - ~/.dbt:/root/.dbt  # Mount dbt profiles
+    environment:
+      - DBT_PROFILES_DIR=/usr/app/dbt
+      - TZ=UTC  # Set timezone
+    user: "${UID:-1000}:${GID:-1000}"  # Use host user's UID/GID
+    command: run  # Default command to run dbt 
